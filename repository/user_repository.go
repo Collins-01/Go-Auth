@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/Collins-01/Go-Auth/models"
@@ -23,17 +22,35 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 
 // A method to create a new user on the database. Returns `409` if a user with the same email already exists.
 func (r *UserRepository) CreateUser(user *models.UserModel) (*models.UserModel, utils.CustomResponse) {
-
-	return nil, utils.CustomResponse{
-		Err:  errors.New("a user with this email already exists"),
-		Code: http.StatusConflict,
+	db := r.db
+	result := db.Create(&user)
+	if result.Error != nil {
+		return nil, utils.CustomResponse{
+			Code: http.StatusInternalServerError,
+		}
+	}
+	return user, utils.CustomResponse{
+		Err:  nil,
+		Code: http.StatusCreated,
 	}
 }
 
 func (r *UserRepository) GetUserByEmail(email string) *models.UserModel {
-	return nil
+	db := r.db
+	var user models.UserModel
+	err := db.First(&user).Where("email = ?", email).Error
+	if err != nil {
+		return nil
+	}
+	return &user
 }
 
 func (r *UserRepository) GetUserByID(id string) *models.UserModel {
-	return nil
+	db := r.db
+	var user models.UserModel
+	err := db.First(&user).Where("id = ?", id).Error
+	if err != nil {
+		return nil
+	}
+	return &user
 }

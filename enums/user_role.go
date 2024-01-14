@@ -1,7 +1,6 @@
 package enums
 
 const (
-	Merchant = iota
-	Individual
-	Rider
+	Admin = iota
+	Regular
 )
